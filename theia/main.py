@@ -1,6 +1,6 @@
 from typing import List
 import numpy as np
-from eop.spec import ImageRecognitionResult
+from theia.spec import ImageRecognitionResult
 
 def image_recognition(image: np.ndarray) -> List[ImageRecognitionResult]:
     """

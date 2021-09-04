@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from numpy.lib.npyio import load
 
-from eop.utils import resizeWithAspectRatio, display, drawContours, timer, logger
+from theia.utils import resizeWithAspectRatio, display, drawContours, timer, logger
 
 MIN_AREA = 3000
 EPSILON_MULTIPLY = 0.01

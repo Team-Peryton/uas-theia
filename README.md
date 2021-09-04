@@ -1,4 +1,4 @@
-# Eye of Providence
+# UAS Theia
 
 Surrey IMechE UAS 2022 Image Recognition program
 
@@ -6,7 +6,7 @@ Interfaces with Nyx like:
 
 ```python
 
-results : List[ImageRecognitionResult] = eop.image_recognition(image : np.ndarray)
+results : List[ImageRecognitionResult] = theia.image_recognition(image : np.ndarray)
 
 # where
 
