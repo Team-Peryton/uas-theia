@@ -11,10 +11,6 @@ def triangulate(position_input: Tuple[float, float], target_uv: Tuple[int, int],
 
     camera : float[]
         (x,y) GPS location of the camera in metres
-    target : float[]
-        (x,y) GPS location of the target in metres
-    resolution : float[]
-        (x,y) array of image resolution
     target_uv : float[]
         (x,y) pixel position of centre of target
     altitude : float
@@ -24,7 +20,7 @@ def triangulate(position_input: Tuple[float, float], target_uv: Tuple[int, int],
     heading : float
         Aircraft bearing in degrees
     """
-    position = np.array(position_input)           # Camera GPS (m)
+    position = np.array(position_input)     # Camera GPS (m)
     uv = np.array(target_uv)                # Target pixel location (px) 
     bearing = math.radians(heading)         # Bearing (rad)
     h = altitude                            # Altitude (m)

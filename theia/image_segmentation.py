@@ -23,69 +23,11 @@ class Square:
     lengths: List[int] = []
 
 
-def order_points(pts):
-	""" https://www.pyimagesearch.com/2014/09/01/build-kick-ass-mobile-document-scanner-just-5-minutes/  """
-	rect = np.zeros((4, 2), dtype = "float32")
-	s = pts.sum(axis = 1)
-	rect[0] = pts[np.argmin(s)]
-	rect[2] = pts[np.argmax(s)]
-	diff = np.diff(pts, axis = 1)
-	rect[1] = pts[np.argmin(diff)]
-	rect[3] = pts[np.argmax(diff)]
-	return rect
-
-
-def four_point_transform(image, pts):
-	""" 
-	https://www.pyimagesearch.com/2014/09/01/build-kick-ass-mobile-document-scanner-just-5-minutes/ 
-	Usage: new_img = four_point_transform(img, squareCountours.reshape(4,2)) 
-	"""
-	rect = order_points(pts)
-	(tl, tr, br, bl) = rect
-	widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-	widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-	maxWidth = max(int(widthA), int(widthB))
-	heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-	heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
-	maxHeight = max(int(heightA), int(heightB))
-	dst = np.array([
-		[0, 0],
-		[maxWidth - 1, 0],
-		[maxWidth - 1, maxHeight - 1],
-		[0, maxHeight - 1]], 
-		dtype = "float32"
-	)
-	M = cv2.getPerspectiveTransform(rect, dst)
-	warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-	return warped
-
-
 def calcDistance(x1, y1, x2, y2):
     param1 = (x2 - x1)
     param2 = (y2 - y1)
     inside = (param1 * param1) + (param2 * param2)
     return math.sqrt(inside)
-
-
-def cropMinAreaRect(img, rect):  # idk how this works but it does
-    # rotate img
-    angle = rect[2]
-    rows, cols = img.shape[0], img.shape[1]
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
-    imgRot = cv2.warpAffine(img, M, (cols, rows))
-
-    # rotate bounding box
-    box = cv2.boxPoints(rect)
-    pts = np.int0(cv2.transform(np.array([box]), M))[0]
-    pts[pts < 0] = 0
-
-    # crop
-    img_crop = imgRot[
-        pts[1][1]:pts[0][1],
-        pts[1][0]:pts[2][0]
-    ]
-
-    return img_crop
 
 
 def approxContour(contour):
@@ -204,46 +146,15 @@ def find_targets(image: np.ndarray, debug=False) -> List[List[np.ndarray, Tuple[
 
     results = []
     for index in squareIndexes:
-        hier = hierarchy[0][index]
-        
-        if hier[3] in squareIndexes:  # if a square has a parent that is also a square
-            target_contour = approxContour(contours[index])
+        target_contour = approxContour(contours[index])
 
-            reshaped = target_contour.reshape(4,2)
+        reshaped = target_contour.reshape(4,2)
 
-            centre = target_centre(reshaped)
+        centre = target_centre(reshaped)
 
-            # deal with the perspective distortion
-            cropped = four_point_transform(image, reshaped)
-            
-            # TODO shave 10 pixels off from all edges to remove the frame..
-            # Shave 10% off instead?
-            cropped_further = cropped[10:-10, 10:-10]
-            
-            if debug:
-                display(cropped_further)
-
-            results.append(
-                cropped_further,
-                centre
-            )
-        
-        else:
-            logger.info("square found with no interior square")
-            #get the position of the square
-            target_contour = approxContour(contours[index])
-            
-            reshaped = target_contour.reshape(4,2)
-            # get the centre of the target, then position
-            centre = target_centre(reshaped)
-
-            cropped = four_point_transform(image, reshaped)
-
-            results.append(
-                cropped,
-                centre
-            )
-            pass
+        results.append(
+            centre
+        )
 
 
     if len(results) == 0:
