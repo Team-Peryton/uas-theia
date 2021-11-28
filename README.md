@@ -21,3 +21,4 @@ class ImageRecognitionResult:
     no_nested_square: bool = False
 
 ```
+
