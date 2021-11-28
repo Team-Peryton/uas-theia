@@ -22,3 +22,4 @@ class ImageRecognitionResult:
 
 ```
 
+dataset download: https://www.sensefly.com/education/datasets/?dataset=1502
