@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from numpy.lib.npyio import load
 
-from theia.utils import resizeWithAspectRatio, display, drawContours, timer, logger
+from theia.utils import resizeWithAspectRatio, display, drawContours
 
 MIN_AREA = 3000
 EPSILON_MULTIPLY = 0.01
@@ -118,7 +118,7 @@ def target_centre(contour: list) -> Tuple[int, int]:
     return int(x), int(y)
 
 
-def find_targets(image: np.ndarray, debug=False) -> List[List[np.ndarray, Tuple[int,int]]]:
+def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
     """ 
     return a colour cropped image of the target, and the centre position within the image
     """
