@@ -1,5 +1,19 @@
 import cv2
 import numpy as np
+import logging
+import time
+
+# any file that imports utils initialises the logger config, useful for when running single files
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s, [%(levelname)s], %(module)-5s, %(message)s",
+    handlers=[
+        logging.FileHandler(f"runtime/logs/log_{time.strftime('%Y%m%d-%H%M%S')}.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("main")
+
 
 def drawContours(image, contours):
     """ """
