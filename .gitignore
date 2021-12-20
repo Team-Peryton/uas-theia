@@ -3,6 +3,8 @@ dataset/raw_dataset/*
 dataset/sim_dataset/*
 dataset/test_images/*
 
+runtime
+
 inspiration
 
 Pipfile

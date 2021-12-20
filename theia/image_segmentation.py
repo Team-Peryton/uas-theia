@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from numpy.lib.npyio import load
 
-from theia.utils import resizeWithAspectRatio, display, drawContours
+from theia.utils import resizeWithAspectRatio, display, drawContours, logger
 
 MIN_AREA = 3000
 EPSILON_MULTIPLY = 0.01
@@ -162,3 +162,6 @@ def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
 
     return results
 
+
+if __name__ == "__main__":
+    pass
