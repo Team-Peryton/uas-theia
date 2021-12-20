@@ -8,4 +8,5 @@ def image_recognition(image: np.ndarray,  gps_image_taken: Tuple(float, float)) 
     The resulting function of all this mess
     """
     logger.info("got image")
-    return ImageRecognitionResult
+    result = ImageRecognitionResult()
+    return result
