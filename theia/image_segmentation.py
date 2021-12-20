@@ -59,7 +59,7 @@ def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
         255,
         cv2.ADAPTIVE_THRESH_MEAN_C, 
         cv2.THRESH_BINARY,
-        199,
+        220,
         -30
     )
     
