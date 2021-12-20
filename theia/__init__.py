@@ -1,1 +1,1 @@
-from theia.main import image_recognition
+#from theia.main import image_recognition
