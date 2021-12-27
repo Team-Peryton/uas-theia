@@ -1,9 +1,10 @@
 from typing import List, Tuple
 import numpy as np
-from theia.spec import ImageRecognitionResult
+from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
 
-def image_recognition(image: np.ndarray,  gps_image_taken: Tuple[float, float]) -> List[ImageRecognitionResult]:
+
+def image_recognition(image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult]:
     """
     The resulting function of all this mess
     """
