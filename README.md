@@ -17,4 +17,8 @@ class ImageRecognitionResult:
     position: Tuple[float,float] = (0.0, 0.0) # lat, lon
 ```
 
+## Dataset setup
+
 dataset download: https://www.sensefly.com/education/datasets/?dataset=1502
+
+should be extracted into the dataset/raw_dataset directory then the datset/generate.ipynb notebook should be run
