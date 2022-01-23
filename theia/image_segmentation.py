@@ -8,7 +8,7 @@ import numpy as np
 from theia.utils import resizeWithAspectRatio, display, drawContours, logger
 
 MIN_AREA = 3000
-EPSILON_MULTIPLY = 0.01
+EPSILON_MULTIPLY = 0.02
 SCALE_FACTOR = 5
 
 
@@ -17,6 +17,7 @@ def approxContour(contour):
     fit contour to a simpler shape
     accuracy is based on EPSILON_MULTIPLY
     """
+
     epsilon = EPSILON_MULTIPLY * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
     return approx
@@ -53,31 +54,36 @@ def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
     return the centre position within the image
     """
     imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    imgBlurred = cv2.GaussianBlur(imgGray, (5, 5), 0)
+    imgBlurred = cv2.GaussianBlur(imgGray, (31, 31), 0)
+    
     img_thresh = cv2.adaptiveThreshold(
         imgBlurred,
         255,
         cv2.ADAPTIVE_THRESH_MEAN_C, 
         cv2.THRESH_BINARY,
-        220,
-        -30
+        199, #349
+        -45 #-65
     )
-    
+   
     if debug: 
         display(img_thresh)
 
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     squareIndexes = filterContours(contours)
     
+    
     if debug:
         for contour in contours:
             cv2.drawContours(image, contour, -1, (0, 255, 0), 3)
         display(image)
-
+    
+    
     # this for loop is mainly to check if there are multiple squares in the same image
     # otherwise there would not be a loop
     results = []
+
     for index in squareIndexes:
+
         target_contour = approxContour(contours[index])
 
         reshaped = target_contour.reshape(4,2)
@@ -87,7 +93,7 @@ def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
         results.append(
             centre
         )
-
+        
 
     if len(results) == 0:
         logger.info("nothing found")
