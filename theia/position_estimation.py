@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from typing import Tuple
+from theia.spec import LocationInfo
 
 RESOLUTION = np.array([4056, 3040]) # px
 FOV = math.radians(63)              # FOV : float, Horizontal field of view in degrees
@@ -8,35 +9,21 @@ EARTH_RADIUS = 6378137.0            # Radius of "spherical" earth
 
 
 def triangulate(
-        position: Tuple[float, float], 
-        target_centre: Tuple[int, int], 
-        altitude: float, 
-        heading: float,
-        pitch: float,
-        roll: float,
-    ):
+        target_centre: Tuple[float, float], location_info: LocationInfo) -> Tuple[float, float]:
     """
     Returns GPS coordinates of target (lat, lon)
 
-    position : float[]
-        (lat,lon) GPS co-ordinates of where the image was taken
-    target_uv : int[]
+    target_centre
         (x,y) pixel position of centre of target
-    altitude : float
-        Altitude in metres, relative to ground
-    heading : float
-        Aircraft heading in degrees
-    pitch : float
-        Aircraft pitch in degrees
-    roll : float
-        Aircraft roll in degrees
+    location_info
+        see spec.py
     """
 
     # convert to useful formats
     uv = np.array(target_centre)            # Target pixel location (px) 
-    heading = math.radians(heading)         # heading (rad)
-    pitch = math.radians(pitch)             # Pitch (rad)
-    roll = math.radians(roll)               # Roll (rad)
+    heading = math.radians(location_info.heading)         # heading (rad)
+    pitch = math.radians(location_info.pitch)             # Pitch (rad)
+    roll = math.radians(location_info.roll)               # Roll (rad)
 
     # heading rotation matrix
     R = np.array([
@@ -48,8 +35,8 @@ def triangulate(
     # Assumes no distortion and that FOV is proportional to resolution. 
     # X followed by Y. Roll affects X, Pitch affects Y
     delta = np.array([
-        altitude * math.tan(roll) + 2 * ((uv[0]/RESOLUTION[0]) - 0.5) * altitude * math.tan(FOV/2 + abs(roll)), 
-        altitude * math.tan(pitch) + 2 * ((uv[1]/RESOLUTION[1]) - 0.5) * altitude * math.tan((RESOLUTION[1]/RESOLUTION[0]) * (FOV/2) + abs(pitch))
+        location_info.alt * math.tan(roll) + 2 * ((uv[0]/RESOLUTION[0]) - 0.5) * location_info.alt * math.tan(FOV/2 + abs(roll)), 
+        location_info.alt * math.tan(pitch) + 2 * ((uv[1]/RESOLUTION[1]) - 0.5) * location_info.alt * math.tan((RESOLUTION[1]/RESOLUTION[0]) * (FOV/2) + abs(pitch))
     ])
     
     # Aligns delta to aircraft heading
@@ -57,9 +44,9 @@ def triangulate(
     
     #Coordinate offsets in radians
     d_lat = delta[1]/EARTH_RADIUS
-    d_lon = delta[0]/(EARTH_RADIUS*math.cos(math.pi*position[1]/180))
+    d_lon = delta[0]/(EARTH_RADIUS*math.cos(math.pi*location_info.lon/180))
 
-    lat = position[0] + (d_lat * 180/math.pi)
-    lon = position[1] + (d_lon * 180/math.pi) 
+    lat = location_info.lat + (d_lat * 180/math.pi)
+    lon = location_info.lon + (d_lon * 180/math.pi) 
 
     return (lat, lon)

@@ -1,29 +1,49 @@
-from dataclasses import dataclass
 import math
-from typing import Any, Dict, List, Tuple
+from typing import List, Tuple
 
 import cv2
 import numpy as np
 
-from theia.utils import resizeWithAspectRatio, display, drawContours, logger
-
-MIN_AREA = 3000
-EPSILON_MULTIPLY = 0.02
-SCALE_FACTOR = 5
+from theia.utils import display, logger
 
 
-def approxContour(contour):
+def calc_distance(p1, p2):
+    """ return the distance between two points """
+    return math.sqrt(((p2[0] - p1[0])**2) + ((p2[1] - p1[0])**2))
+
+
+def get_contour_lengths(approx: List[List[List[int]]]) -> List[int]:
+    """ 
+    extract lengths from the co-ordinates 
+    """
+    # unnest and arrange into each corner co-ords
+    # this could be done programmatically but not really worth it
+    verticies = [
+            [approx[0][0], approx[1][0]],
+            [approx[1][0], approx[2][0]],
+            [approx[2][0], approx[3][0]],
+            [approx[3][0], approx[0][0]]
+        ]
+    lengths = list(map(lambda x: calc_distance(x[0], x[1]), verticies))
+    return sorted(lengths)
+
+
+def is_square(lengths, options) -> bool:
+    """ check if the longest side is close in length to the shortest side """
+    return ((lengths[3] - lengths[0]) / lengths[3]) < options["square_ar"]
+
+
+def approxContour(contour, options):
     """
     fit contour to a simpler shape
     accuracy is based on EPSILON_MULTIPLY
     """
-
-    epsilon = EPSILON_MULTIPLY * cv2.arcLength(contour, True)
+    epsilon = options['epsilon'] * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
     return approx
 
 
-def filterContours(contours):
+def filterContours(contours, options):
     """ 
     return only the contours that are squares
     """
@@ -31,11 +51,11 @@ def filterContours(contours):
 
     # filter contours
     for i, contour in enumerate(contours):  # for each of the found contours
-        if cv2.contourArea(contour) > MIN_AREA:
-            approx = approxContour(contour)
+        if cv2.contourArea(contour) > options["min_area"]:
+            approx = approxContour(contour, options)
             if len(approx) == 4:
-                #s = getSquareLengths(approx)
-                squareIndexes.append(i)
+                if is_square(get_contour_lengths(approx), options):
+                    squareIndexes.append(i)
     
     return squareIndexes
 
@@ -49,42 +69,39 @@ def target_centre(contour: list) -> Tuple[int, int]:
     return int(x), int(y)
 
 
-def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
+
+def find_targets(image: np.ndarray, options, debug=False) -> List[Tuple[int,int]]:
     """ 
     return the centre position within the image
     """
     imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    imgBlurred = cv2.GaussianBlur(imgGray, (31, 31), 0)
-    
+    imgBlurred = cv2.GaussianBlur(imgGray, (options["ksize"], options["ksize"]), options["sigma"])
     img_thresh = cv2.adaptiveThreshold(
         imgBlurred,
         255,
         cv2.ADAPTIVE_THRESH_MEAN_C, 
         cv2.THRESH_BINARY,
-        199, #349
-        -45 #-65
+        options["block_size"],
+        options["c"]
     )
-   
+    
     if debug: 
         display(img_thresh)
 
-    contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[-2:]
-    squareIndexes = filterContours(contours)
-    
+    contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+    squareIndexes = filterContours(contours, options)
     
     if debug:
-        for contour in contours:
-            cv2.drawContours(image, contour, -1, (0, 255, 0), 3)
+        for index in squareIndexes:
+            cv2.drawContours(image, contours[index], -1, (0, 255, 0), 3)
         display(image)
-    
-    
+
     # this for loop is mainly to check if there are multiple squares in the same image
     # otherwise there would not be a loop
+
     results = []
-
     for index in squareIndexes:
-
-        target_contour = approxContour(contours[index])
+        target_contour = approxContour(contours[index], options)
 
         reshaped = target_contour.reshape(4,2)
 
@@ -93,13 +110,9 @@ def find_targets(image: np.ndarray, debug=False) -> List[List[Tuple[int,int]]]:
         results.append(
             centre
         )
-        
+
 
     if len(results) == 0:
-        logger.info("nothing found")
+        pass
 
     return results
-
-
-if __name__ == "__main__":
-    pass

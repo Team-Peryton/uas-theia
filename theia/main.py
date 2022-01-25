@@ -1,13 +1,40 @@
-from typing import List, Tuple
+from datetime import datetime
+from typing import List
+
+import cv2
 import numpy as np
+
+from theia.image_segmentation import find_targets
+from theia.position_estimation import triangulate
 from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
 
+class ImageRecognition:
 
-def image_recognition(image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult]:
-    """
-    The resulting function of all this mess
-    """
-    logger.info("got image")
-    result = ImageRecognitionResult()
-    return result
+    def __init__(self, file_base_directory):
+        self.options = {
+            "block_size": 249,
+            "c": -39,
+            "ksize": 49,
+            "sigma": 0,
+            "epsilon": 0.02,
+            "square_ar": 0.4,
+            "min_area": 3000,
+        }
+        self.file_base_directory = file_base_directory
+
+
+    def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult] | None:
+        """
+        The resulting function of all this mess
+        """
+        logger.info("processing image")
+        target_pixel_locations = find_targets(image, self.options)
+        for target in target_pixel_locations:
+            location = triangulate(target, location_info)
+            image_name = self.file_base_directory + "\\runtime\\" + datetime.now().strftime("%d%m%Y_%H-%M-%S.%f") + ".jpg"
+            cv2.imwrite(image_name, image)
+            result = ImageRecognitionResult(image_name=image_name, centre=target, position=location)
+            logger.info(result)
+            return result
+        return None
