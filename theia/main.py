@@ -22,6 +22,7 @@ class ImageRecognition:
             "min_area": 3000,
         }
         self.file_base_directory = file_base_directory
+        self.found_targets = []
 
 
     def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult] | None:
@@ -36,5 +37,13 @@ class ImageRecognition:
             cv2.imwrite(image_name, image)
             result = ImageRecognitionResult(image_name=image_name, centre=target, position=location)
             logger.info(result)
-            return result
+            self.found_targets.append(result)
         return None
+
+    
+    def calaculate_target_position(self):
+        """ 
+        from the targets found, estimate the actual centre of the target
+        done just before landing
+        """
+        pass
