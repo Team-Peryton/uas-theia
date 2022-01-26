@@ -9,6 +9,7 @@ from theia.position_estimation import triangulate
 from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
 
+
 class ImageRecognition:
 
     def __init__(self, file_base_directory):
@@ -22,7 +23,7 @@ class ImageRecognition:
             "min_area": 3000,
         }
         self.file_base_directory = file_base_directory
-        self.found_targets = []
+        self.found_targets: ImageRecognitionResult = []
 
 
     def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult] | None:
@@ -40,7 +41,7 @@ class ImageRecognition:
             self.found_targets.append(result)
         return None
 
-    
+
     def calaculate_target_position(self):
         """ 
         from the targets found, estimate the actual centre of the target
