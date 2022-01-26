@@ -4,6 +4,7 @@ dataset/sim_dataset/*
 dataset/test_images/*
 dataset/transform_dataset/*
 dataset/target_positions
+dataset/target_positions_transformed
 
 runtime
 
