@@ -1,3 +1,6 @@
+from typing import Dict, List, Tuple
+
+
 def clustering(X,Y):
     
     from sklearn.cluster import DBSCAN
@@ -16,49 +19,46 @@ def clustering(X,Y):
     num_classes = len(cluster_centers)
     
     # Remove this when using GPS coordinate inputs
-    X, y = make_blobs(n_samples = num_samples_total, centers = cluster_centers, n_features = num_classes, center_box=(0, 1), cluster_std = 0.5)
+    coordinates, y = make_blobs(n_samples = num_samples_total, centers = cluster_centers, n_features = num_classes, center_box=(0, 1), cluster_std = 0.5)
     
     #dbscan configuration
     epsilon = 0.5
     min_samples = 5
 
     # Compute DBSCAN
-    db = DBSCAN(eps=epsilon, min_samples=min_samples).fit(X)
+    db = DBSCAN(eps=epsilon, min_samples=min_samples).fit(coordinates)
     labels = db.labels_
-   
+
+    # number of clusters and noise points
     no_clusters = len(np.unique(labels))-(1 if -1 in labels else 0)
     no_noise = np.sum(np.array(labels) == -1, axis=0)
 
     # remove noisy points (points labeled as noise by dbscan), make new array without these
-    range_max = len(X)
-    X = np.array([X[i] for i in range(range_max) if labels[i] != -1])
+    range_max = len(coordinates)
+    filtered_coordinates = np.array([coordinates[i] for i in range(range_max) if labels[i] != -1])
     labels = np.array([labels[i] for i in range(range_max) if labels[i] != -1])
- 
-    print('Estimated no. of clusters: %d' % no_clusters)
-    print('Estimated no. of noise points: %d' % no_noise)
 
-    # Generate scatter plot for this data
-    cluster_coords = []
-    for i in range(len(np.unique(labels))):
-        cluster_coords.append([])
-    for i in range(0,len(labels)):
-        cluster_coords[labels[i]].append(X[i])
-    
+    # sort coordinates into arrays based on which cluster they belong to
+    cluster_coords: Dict[int, List[Tuple[float,float]]] = {label: [] for label in labels}
+    for i, label in enumerate(labels):
+        cluster_coords[label].append(filtered_coordinates[i]) 
+
     # Average cluster coordinates to find average centres
     # And Find centres coordinate of cluster with most points in it (aware this isnt the most elegant way)
     cluster_centres = []
     longest_index = 0
     length = []
-    for i in range(len(np.unique(labels))):
-        length.append(len(cluster_coords[i]))
-        if length[i]==max(length):
-            longest_index = i
-        cluster_centres.append(np.average(cluster_coords[i],axis=0))
+    for cluster_number in cluster_coords:
+        length.append(len(cluster_coords[cluster_number]))
+        if length[cluster_number] == max(length):
+            longest_index = cluster_number
+        cluster_centres.append(np.average(cluster_coords[cluster_number], axis=0))
+
     print(cluster_centres[longest_index])
      
     # Plot points, with cluster with max number of points coloured red and other clusters blue
     colors = list(map(lambda x: '#b40426' if x == longest_index else '#3b4cc0', labels))
-    plt.scatter(X[:,0], X[:,1], c=colors, marker="x", picker=True)
+    plt.scatter(filtered_coordinates[:,0], filtered_coordinates[:,1], c=colors, marker="x", picker=True)
     plt.title('Clustered data')
     plt.xlabel('X')
     plt.ylabel('Y')

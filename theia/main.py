@@ -11,6 +11,9 @@ from theia.utils import logger
 
 
 class ImageRecognition:
+    """
+    all image rec functionality is here
+    """
 
     def __init__(self, file_base_directory):
         self.options = {
@@ -43,9 +46,8 @@ class ImageRecognition:
 
 
     def calaculate_target_position(self):
-        """ 
+        """
         from the targets found, estimate the actual centre of the target
         done just before landing
         """
-        
-        pass
+        return
