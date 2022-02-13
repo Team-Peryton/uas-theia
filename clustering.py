@@ -1,11 +1,6 @@
 def clustering(X,Y):
     
-    from sklearn.cluster import DBSCAN
-    from sklearn.datasets import make_blobs
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from random import uniform
-    from numpy import array,reshape,hstack,size
+
 
     # Configuration options
     num_samples_total = 1000
@@ -37,7 +32,6 @@ def clustering(X,Y):
     print('Estimated no. of clusters: %d' % no_clusters)
     print('Estimated no. of noise points: %d' % no_noise)
 
-    # Generate scatter plot for this data
     cluster_coords = []
     for i in range(len(np.unique(labels))):
         cluster_coords.append([])
