@@ -47,4 +47,5 @@ class ImageRecognition:
         from the targets found, estimate the actual centre of the target
         done just before landing
         """
+        
         pass

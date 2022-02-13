@@ -50,3 +50,48 @@ def triangulate(
     lon = location_info.lon + (d_lon * 180/math.pi) 
 
     return (lat, lon)
+
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_blobs
+import numpy as np
+import matplotlib.pyplot as plt
+from random import uniform
+from numpy import array,reshape,hstack,size
+
+def clustering(X,y):
+    #dbscan configuration
+    epsilon = 0.5
+    min_samples = 5
+
+    # Compute DBSCAN
+    db = DBSCAN(eps=epsilon, min_samples=min_samples).fit(X)
+    labels = db.labels_
+   
+    # number of clusters and noise points
+    no_clusters = len(np.unique(labels))-(1 if -1 in labels else 0)
+    no_noise = np.sum(np.array(labels) == -1, axis=0)
+
+    # remove noisy points (points labeled as noise by dbscan), make new array without these
+    range_max = len(X)
+    X = np.array([X[i] for i in range(range_max) if labels[i] != -1])
+    labels = np.array([labels[i] for i in range(range_max) if labels[i] != -1])
+
+    # sort coordinates into arrays based on which cluster they belong to
+    cluster_coords = []
+    for i in range(len(np.unique(labels))):
+        cluster_coords.append([])
+    for i in range(0,len(labels)):
+        cluster_coords[labels[i]].append(X[i])
+    
+    # Average cluster coordinates to find average centres
+    # And Find centres coordinate of cluster with most points in it (aware this isnt the most elegant way)
+    cluster_centres = []
+    longest_index = 0
+    length = []
+    for i in range(len(np.unique(labels))):
+        length.append(len(cluster_coords[i]))
+        if length[i]==max(length):
+            longest_index = i
+        cluster_centres.append(np.average(cluster_coords[i],axis=0))
+    
+    return(cluster_centres[longest_index],no_clusters,no_noise)
