@@ -26,7 +26,7 @@ class ImageRecognition:
             "min_area": 3000,
         }
         self.file_base_directory = file_base_directory
-        self.found_targets: ImageRecognitionResult = []
+        self.found_targets: List[ImageRecognitionResult] = []
 
 
     def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult] | None:
