@@ -8,6 +8,7 @@ from theia.image_segmentation import find_targets
 from theia.position_estimation import triangulate
 from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
+from theia.clustering import cluster
 
 
 class ImageRecognition:
@@ -29,7 +30,7 @@ class ImageRecognition:
         self.found_targets: List[ImageRecognitionResult] = []
 
 
-    def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> List[ImageRecognitionResult] | None:
+    def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> None:
         """
         The resulting function of all this mess
         """
@@ -37,12 +38,11 @@ class ImageRecognition:
         target_pixel_locations = find_targets(image, self.options)
         for target in target_pixel_locations:
             location = triangulate(target, location_info)
-            image_name = self.file_base_directory + "\\runtime\\" + datetime.now().strftime("%d%m%Y_%H-%M-%S.%f") + ".jpg"
+            image_name = f"{self.file_base_directory} \\runtime\\ {datetime.now().strftime('%d%m%Y_%H-%M-%S.%f')}.jpg"
             cv2.imwrite(image_name, image)
             result = ImageRecognitionResult(image_name=image_name, centre=target, position=location)
             logger.info(result)
             self.found_targets.append(result)
-        return None
 
 
     def calaculate_target_position(self):
@@ -50,4 +50,13 @@ class ImageRecognition:
         from the targets found, estimate the actual centre of the target
         done just before landing
         """
-        return
+        logger.info("Starting clustering")
+        coordinates = [result.position for result in self.found_targets]
+        target_location = cluster(coordinates)
+        return target_location
+    
+    
+    def get_found_targets(self):
+        """ debug tool """
+        logger.info(self.found_targets)
+        return self.found_targets
