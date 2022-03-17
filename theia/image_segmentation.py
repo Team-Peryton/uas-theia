@@ -79,7 +79,7 @@ def find_targets(image: np.ndarray, options, debug=False) -> List[Tuple[int,int]
     img_thresh = cv2.adaptiveThreshold(
         imgBlurred,
         255,
-        cv2.ADAPTIVE_THRESH_MEAN_C, 
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
         cv2.THRESH_BINARY,
         options["block_size"],
         options["c"]

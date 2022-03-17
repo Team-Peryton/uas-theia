@@ -7,11 +7,22 @@ from theia.utils import display
 files = [f for f in os.listdir('./dataset/sim_dataset/')]
 unsuccessful = 0
 successful = 0
-for x in range(0,115):
+options = {
+    "block_size": 599,
+    "c": -29,
+    "ksize": 39,
+    "sigma": 0,
+    "epsilon": 0.02,
+    "square_ar": 0.95,
+    "min_area": 50,
+}
+for x in range(0,len(files)):
     image = cv2.imread('./dataset/sim_dataset/' + files[x])
-    square_center = image_segmentation.find_targets(image, debug=False)
+    square_center = image_segmentation.find_targets(image, options, debug=False)
     if square_center == []:
         unsuccessful += 1
+        square_center = image_segmentation.find_targets(image, options, debug=True)
     else: 
         successful += 1
-print('\naccuracy was ' + str((successful/(unsuccessful+successful))*100)+ '%\n')
+accuracy=(successful/(successful+unsuccessful))
+print(accuracy*100)
