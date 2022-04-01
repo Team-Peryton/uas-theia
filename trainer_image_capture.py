@@ -16,7 +16,7 @@ print("connecte to autopilot")
 print(vehicle)
 print(picam2)
 
-config = picam2.still_configuration(main={"size": (3840,2160)}) #these 3 lines should turn off preview
+config = picam2.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
 picam2.configure(config)
 picam2.start_preview(Preview.NULL)
 
