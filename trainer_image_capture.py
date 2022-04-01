@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger()
 logging.basicConfig(level=logging.CRITICAL)
 
-picam2 = Picamera2()
+picam2 = Picamera2(verbose_console=0)
 vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True) #(not sure how we're connecting to the pi)
 
 print(vehicle)
@@ -23,9 +23,9 @@ time.sleep(2)
 
 try:
     while(True): #change condition to something like "while armed" using dronekit. or use vehicle mission attribute for working with waypoints? 
-        time.sleep(1/fps) #check units
+        #time.sleep(1/fps) #check units
         location = vehicle.location.global_frame #check if this actually yields coorect gps coordinates. cant really test without pixhawk
-        metadata = picam2.capture_file(f"/media/pi/USB DISK/{location.alt},{location.lon},{location.alt},{time.time()}.jpg")
+        metadata = picam2.capture_file(f"/media/pi/USB DISK/{location.alt},{location.lon},{location.lat},{time.time()}.jpg")
 except KeyboardInterrupt:
     print("keyboard interupt")
 except Exception:
