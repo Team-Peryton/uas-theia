@@ -31,8 +31,8 @@ try:
         location = vehicle.location.global_frame #check if this actually yields coorect gps coordinates. cant really test without pixhawk
         heading = vehicle.heading
         roll = vehicle._roll
-        yaw = vehicle._yaw
-        metadata = picam2.capture_file(f"/media/pi/USB DISK/{location.alt},{location.lon},{location.lat},{heading},{roll},{yaw},{time.time()}.jpg")
+        pitch = vehicle._pitch
+        metadata = picam2.capture_file(f"/media/pi/USB DISK/{location.alt},{location.lon},{location.lat},{heading},{roll},{pitch},{time.time()}.jpg")
 except KeyboardInterrupt:
     print("keyboard interupt")
 except Exception:
