@@ -7,7 +7,7 @@ logger = logging.getLogger()
 logging.basicConfig(level=logging.CRITICAL)
 
 picam2 = Picamera2()
-vehicle = connect('/dev/USB', wait_ready=True) #(not sure how we're connecting to the pi)
+vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True) #(not sure how we're connecting to the pi)
 
 print(vehicle)
 print(picam2)
