@@ -21,7 +21,7 @@ try:
     while(True): #change condition to something like "while armed" using dronekit. or use vehicle mission attribute for working with waypoints? 
         time.sleep(1/fps) #check units
         location = str(vehicle.location.global_frame).strip("LocationGlobal") #check if this actually yields coorect gps coordinates. cant really test without pixhawk
-        metadata = picam2.capture_file(location+".jpg")
+        metadata = picam2.capture_file(f"/media/pi/'USB DISK'/{location}.jpg")
 except KeyboardInterrupt:
     print("keyboard interupt")
 except Exception:
