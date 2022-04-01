@@ -3,11 +3,15 @@ import time
 from dronekit import connect
 import logging
 
-logger = logging.getLogger()
-logging.basicConfig(level=logging.CRITICAL)
+
 
 picam2 = Picamera2(verbose_console=0)
+
+logger = logging.getLogger('picamera2')
+logging.basicConfig(level=logging.CRITICAL)
+
 vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True) #(not sure how we're connecting to the pi)
+print("connecte to autopilot")
 
 print(vehicle)
 print(picam2)
