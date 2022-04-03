@@ -6,7 +6,7 @@ from sklearn.cluster import DBSCAN
 
 from theia.spec import LocationInfo
 
-RESOLUTION = np.array([4056, 3040]) # px
+RESOLUTION = np.array([1080, 1920]) # px
 FOV = math.radians(63)              # FOV : float, Horizontal field of view in degrees
 EARTH_RADIUS = 6378137.0            # Radius of "spherical" earth
 
@@ -25,8 +25,8 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
     # Target pixel location (px)
     uv = np.array(target_centre)
     heading = math.radians(location_info.heading)         # heading (rad)
-    pitch = math.radians(location_info.pitch)             # Pitch (rad)
-    roll = math.radians(location_info.roll)               # Roll (rad)
+    pitch = location_info.pitch             # Pitch (rad)
+    roll = location_info.roll               # Roll (rad)
 
     # heading rotation matrix
     R = np.array([
