@@ -51,13 +51,16 @@ def filterContours(contours, options):
 
     # filter contours
     for i, contour in enumerate(contours):  # for each of the found contours
-        if cv2.contourArea(contour) > options["min_area"]:
+        if cv2.contourArea(contour) > options["min_area"]: # remove any tiny noise bits
             approx = approxContour(contour, options)
-            if len(approx) == 4:
-                if is_square(get_contour_lengths(approx), options):
+            if len(approx) in options["sides"]:
+                area = cv2.contourArea(approx)
+                hull = cv2.convexHull(approx)
+                hull_area = cv2.contourArea(hull)
+                solidity = float(area)/hull_area
+                #if is_square(get_contour_lengths(approx), options):
+                if solidity > options["min_solidity"]:
                     squareIndexes.append(i)
-    
-    return squareIndexes
 
 
 def target_centre(contour: list) -> Tuple[int, int]:

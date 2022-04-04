@@ -18,13 +18,14 @@ class ImageRecognition:
 
     def __init__(self, file_base_directory):
         self.options = {
-            "block_size": 249,
+            "block_size": 399,
             "c": -39,
-            "ksize": 49,
+            "ksize": 39,
             "sigma": 0,
-            "epsilon": 0.02,
-            "square_ar": 0.4,
-            "min_area": 3000,
+            "epsilon": 0.1,
+            "min_area": 1000,
+            "sides":[4],
+            "min_solidity": 0.6,
         }
         self.file_base_directory = file_base_directory
         self.found_targets: List[ImageRecognitionResult] = []
