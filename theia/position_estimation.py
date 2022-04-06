@@ -6,6 +6,8 @@ from sklearn.cluster import DBSCAN
 
 from theia.spec import LocationInfo
 
+from shapely import geometry
+
 RESOLUTION = np.array([1080, 1920]) # px
 FOV = math.radians(63)              # FOV : float, Horizontal field of view in degrees
 EARTH_RADIUS = 6378137.0            # Radius of "spherical" earth
@@ -57,6 +59,27 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
     return (lat, lon)
 
 
+def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tuple[float,float]]:
+    # takes all cluster centres as inputs and excludes anything outside the competition perimeter
+    # input competition perimeter GPS coordinates prior to competition. 
+    
+    # GPS coords of airfield
+    perimeter = [(0,0),(1,1),(0,1),(1,0)]
+
+    line = geometry.LineString(perimeter)
+    perimeter = geometry.Polygon(line)
+    target_centres = []
+    
+    # probably a better way to do it than the loop
+    for i in range(len(coordinates)):
+        point_X = coordinates[i][0]
+        point_Y = coordinates[i][1]
+        point = geometry.Point(point_X, point_Y)
+        if perimeter.contains(point):
+            target_centres.append(point)
+
+    return(target_centres)
+
 def clustering(coordinates: List[Tuple[float, float]], epsilon=0.5, min_samples=5):
     """
     given a list of GPS co-ordinates, find the most likely location of the target.
@@ -93,3 +116,6 @@ def clustering(coordinates: List[Tuple[float, float]], epsilon=0.5, min_samples=
         cluster_centres.append(np.average(cluster_coords[cluster_number], axis=0))
 
     return(cluster_centres[longest_index], no_clusters, no_noise)
+
+
+
