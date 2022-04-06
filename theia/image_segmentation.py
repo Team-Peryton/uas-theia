@@ -61,6 +61,7 @@ def filterContours(contours, options):
                 #if is_square(get_contour_lengths(approx), options):
                 if solidity > options["min_solidity"]:
                     squareIndexes.append(i)
+    return squareIndexes
 
 
 def target_centre(contour: list) -> Tuple[int, int]:
