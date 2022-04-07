@@ -67,7 +67,7 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
     perimeter = [(0,0),(1,1),(0,1),(1,0)]
 
     line = geometry.LineString(perimeter)
-    perimeter = geometry.Polygon(line)
+    perimeter_poly = geometry.Polygon(line)
     target_centres = []
     
     # probably a better way to do it than the loop
@@ -75,7 +75,7 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
         point_X = coordinates[i][0]
         point_Y = coordinates[i][1]
         point = geometry.Point(point_X, point_Y)
-        if perimeter.contains(point):
+        if perimeter_poly.contains(point):
             target_centres.append(point)
 
     return(target_centres)
