@@ -10,7 +10,7 @@ picam2 = Picamera2(verbose_console=0)
 logger = logging.getLogger('picamera2')
 logging.basicConfig(level=logging.CRITICAL)
 
-vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True) #(not sure how we're connecting to the pi)
+vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True)
 print("connecte to autopilot")
 
 print(vehicle)
@@ -19,8 +19,6 @@ print(picam2)
 config = picam2.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
 picam2.configure(config)
 picam2.start_preview(Preview.NULL)
-
-fps = 5 # how many fps to record
 
 picam2.start()
 time.sleep(2)
@@ -32,7 +30,8 @@ try:
         heading = vehicle.heading
         roll = vehicle._roll
         pitch = vehicle._pitch
-        metadata = picam2.capture_file(f"/media/pi/USB DISK/{location.alt},{location.lon},{location.lat},{heading},{roll},{pitch},{time.time()}.jpg")
+        t = time.time()
+        metadata = picam2.capture_file(f"/media/pi/USB DISK/{location.alt},{location.lon},{location.lat},{heading},{roll},{pitch},{t}.jpg")
 except KeyboardInterrupt:
     print("keyboard interupt")
 except Exception:

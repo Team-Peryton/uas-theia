@@ -74,7 +74,7 @@ def target_centre(contour: list) -> Tuple[int, int]:
 
 
 
-def find_targets(image: np.ndarray, options, debug=False) -> List[Tuple[int,int]]:
+def find_targets(image: np.ndarray, options) -> List[Tuple[int,int]]:
     """ 
     return the centre position within the image
     """
@@ -89,13 +89,13 @@ def find_targets(image: np.ndarray, options, debug=False) -> List[Tuple[int,int]
         options["c"]
     )
     
-    if debug: 
+    if options["debug"]: 
         display(img_thresh)
 
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     squareIndexes = filterContours(contours, options)
     
-    if debug:
+    if options["debug"]:
         for index in squareIndexes:
             cv2.drawContours(image, contours[index], -1, (0, 255, 0), 3)
         display(image)
