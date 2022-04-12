@@ -1,4 +1,5 @@
 from datetime import datetime
+from distutils.log import debug
 from typing import List
 
 import cv2
@@ -26,6 +27,7 @@ class ImageRecognition:
             "min_area": 1000,
             "sides":[4],
             "min_solidity": 0.6,
+            "debug": False
         }
         self.file_base_directory = file_base_directory
         self.found_targets: List[ImageRecognitionResult] = []

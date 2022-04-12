@@ -24,9 +24,8 @@ picam2.start()
 time.sleep(2)
 
 try:
-    while(True): #change condition to something like "while armed" using dronekit. or use vehicle mission attribute for working with waypoints? 
-        #time.sleep(1/fps) #check units
-        location = vehicle.location.global_frame #check if this actually yields coorect gps coordinates. cant really test without pixhawk
+    while(vehicle.armed):
+        location = vehicle.location.global_frame
         heading = vehicle.heading
         roll = vehicle._roll
         pitch = vehicle._pitch

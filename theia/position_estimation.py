@@ -9,8 +9,16 @@ from theia.spec import LocationInfo
 from shapely import geometry
 
 RESOLUTION = np.array([1080, 1920]) # px
-FOV = math.radians(63)              # FOV : float, Horizontal field of view in degrees
+ASPECT_RATIO = RESOLUTION[1]/RESOLUTION[0]
+FOV = math.radians(63)
 EARTH_RADIUS = 6378137.0            # Radius of "spherical" earth
+
+# from https://stackoverflow.com/questions/31257664/relation-between-horizontal-vertical-and-diagonal-field-of-view
+SENSOR_W = 6.4 #mm
+SENSOR_H = SENSOR_W / ASPECT_RATIO #mm
+LENS_F = 6 #mm
+FOV_X = 2 * math.atan2(SENSOR_W/2, LENS_F)
+FOV_Y = 2 * math.atan2(SENSOR_H/2, LENS_F)
 
 
 def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo) -> Tuple[float, float]:
@@ -27,8 +35,6 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
     # Target pixel location (px)
     uv = np.array(target_centre)
     heading = math.radians(location_info.heading)         # heading (rad)
-    pitch = location_info.pitch             # Pitch (rad)
-    roll = location_info.roll               # Roll (rad)
 
     # heading rotation matrix
     R = np.array([
@@ -40,16 +46,30 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
     # Assumes no distortion and that FOV is proportional to resolution.
     # X followed by Y. Roll affects X, Pitch affects Y
     delta = np.array([
-        location_info.alt * math.tan(roll) + 2 * (
-            (uv[0]/RESOLUTION[0]) - 0.5) * location_info.alt * math.tan(FOV/2 + abs(roll)),
-        location_info.alt * math.tan(pitch) + 2 * ((uv[1]/RESOLUTION[1]) - 0.5) * location_info.alt * math.tan(
-            (RESOLUTION[1]/RESOLUTION[0]) * (FOV/2) + abs(pitch))
+        # X
+        (
+            location_info.alt * math.tan(location_info.roll)
+        ) + (
+            2 * ((uv[0]/RESOLUTION[0]) - 0.5)
+        ) * (
+            location_info.alt * math.tan(FOV_X/2 + abs(location_info.roll))
+        ),
+
+        # Y
+        (
+            location_info.alt * math.tan(location_info.pitch)
+        ) + (
+            2 * ((uv[1]/RESOLUTION[1]) - 0.5)
+        ) * (
+            location_info.alt * math.tan((RESOLUTION[1]/RESOLUTION[0]) * (FOV_Y/2) + abs(location_info.pitch))
+        )
     ])
 
     # Aligns delta to aircraft heading
     delta = np.matmul(delta, R)
 
     # Coordinate offsets in radians
+    # this is using a simple model so could be improved
     d_lat = delta[1]/EARTH_RADIUS
     d_lon = delta[0]/(EARTH_RADIUS*math.cos(math.pi*location_info.lon/180))
 
