@@ -44,6 +44,7 @@ try:
         
         t = time.time()
         metadata = picam2.capture_file(f"/media/pi/USB DISK/{t},{location},{heading},{attitude}.jpg")
+        
 except KeyboardInterrupt:
     print("keyboard interupt")
 except Exception:

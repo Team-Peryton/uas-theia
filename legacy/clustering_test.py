@@ -1,7 +1,7 @@
 from sklearn.cluster import DBSCAN
 from sklearn.datasets import make_blobs
 
-from theia.clustering import cluster
+from legacy.clustering import cluster
 
 
 # Configuration options

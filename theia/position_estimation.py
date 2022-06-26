@@ -100,10 +100,11 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
 
     return(target_centres)
 
+
 def clustering(coordinates: List[Tuple[float, float]], epsilon=0.5, min_samples=5):
     """
     given a list of GPS co-ordinates, find the most likely location of the target.
-    epsilon and min_samples as arguements to DBSCAN
+    epsilon and min_samples as arguments to DBSCAN
     """
 
     # Compute DBSCAN
