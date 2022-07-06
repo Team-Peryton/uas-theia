@@ -84,7 +84,14 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
     # input competition perimeter GPS coordinates prior to competition. 
     
     # GPS coords of airfield
-    perimeter = [(0,0),(1,1),(0,1),(1,0)]
+    perimeter = [(52.779413, -0.704785),
+(52.781214, -0.702219),
+(52.783095, -0.706073),
+(52.784349, -0.707847),
+(52.785987, -0.711378),
+(52.785614, -0.713564),
+(52.782835, -0.715637),
+(52.778343, -0.712970)]
 
     line = geometry.LineString(perimeter)
     perimeter_poly = geometry.Polygon(line)
@@ -101,7 +108,7 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
     return(target_centres)
 
 
-def clustering(coordinates: List[Tuple[float, float]], epsilon=0.5, min_samples=5):
+def clustering(coordinates: List[Tuple[float, float]], epsilon=0.0006, min_samples=5):
     """
     given a list of GPS co-ordinates, find the most likely location of the target.
     epsilon and min_samples as arguments to DBSCAN

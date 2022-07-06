@@ -9,7 +9,7 @@ import numpy as np
 from legacy.clustering import cluster
 
 from theia.image_segmentation import find_targets
-from theia.position_estimation import triangulate, clustering
+from theia.position_estimation import triangulate, clustering, exclude_outside_perimeter
 from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
 
@@ -70,6 +70,7 @@ class ImageRecognition:
         """
         logger.info("Starting clustering")
         coordinates = [result.position for result in self.found_targets]
+        coordinates = exclude_outside_perimeter(coordinates)
         target_location = clustering(coordinates)
 
         logger.info(f"""
