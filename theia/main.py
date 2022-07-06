@@ -1,3 +1,4 @@
+
 from datetime import datetime
 from distutils.log import debug
 from typing import List
@@ -36,10 +37,10 @@ class ImageRecognition:
         
         logger.warn("Configuring the camera")
         self.picam = Picamera2(verbose_console=0)
-        config = picam.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
-        picam.configure(config)
-        picam.start_preview(Preview.NULL)
-        picam2.start()
+        config = self.picam.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
+        self.picam.configure(config)
+        self.picam.start_preview(Preview.NULL)
+        self.picam.start()
 
         logger.warn("Connecting to Ardupilot")
         self.vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True)
@@ -56,7 +57,7 @@ class ImageRecognition:
         target_pixel_locations = find_targets(image, self.options)
         for target in target_pixel_locations:
             location = triangulate(target, location_info)
-            image_name = f"{self.file_base_directory} \\runtime\\ {datetime.now().strftime('%d%m%Y_%H-%M-%S.%f')}.jpg"
+            image_name = f"{self.file_base_directory}/runtime/{datetime.now().strftime('%d%m%Y_%H-%M-%S.%f')}.jpg"
             cv2.imwrite(image_name, image)
             result = ImageRecognitionResult(image_name=image_name, centre=target, position=location)
             logger.info(result)
@@ -70,7 +71,9 @@ class ImageRecognition:
         """
         logger.info("Starting clustering")
         coordinates = [result.position for result in self.found_targets]
-        coordinates = exclude_outside_perimeter(coordinates)
+        logger.info(f"got raw co-ords{coordinates}")
+        #coordinates = exclude_outside_perimeter(coordinates)
+        logger.info(f"got filtered co-ords {coordinates}")
         target_location = clustering(coordinates)
 
         logger.info(f"""

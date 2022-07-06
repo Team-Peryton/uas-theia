@@ -1,12 +1,11 @@
 from theia.main import ImageRecognition
 
-ir = ImageRecognition("/media/pi/USB DISK/")
+ir = ImageRecognition("/media/pi/USB DISK")
 
 try:
     while True:
-        while ir.vehicle.armed:
-            ir.image_recognition(ir.get_image(), ir.get_location_info())
-            flag = True
+        while True:
+            ir.image_recognition(ir.get_image(), ir.get_location_info())        
         
         ir.calaculate_target_position()
         ir.get_found_targets()
