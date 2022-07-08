@@ -60,7 +60,7 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
         (
             location_info.alt * math.tan(location_info.pitch)
         ) + (
-            2 * ((uv[1]/RESOLUTION[1]) - 0.5)
+            2 * (((uv[1]/RESOLUTION[1])) - 0.5)
         ) * (
             location_info.alt * math.tan((RESOLUTION[1]/RESOLUTION[0]) * (FOV_Y/2) + abs(location_info.pitch))
         )

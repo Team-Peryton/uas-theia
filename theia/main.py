@@ -1,3 +1,4 @@
+
 from datetime import datetime
 from distutils.log import debug
 from typing import List
@@ -79,7 +80,9 @@ class ImageRecognition:
         """
         logger.info("Starting clustering")
         coordinates = [result.position for result in self.found_targets]
-        coordinates = exclude_outside_perimeter(coordinates)
+        logger.info(f"got raw co-ords{coordinates}")
+        #coordinates = exclude_outside_perimeter(coordinates)
+        logger.info(f"got filtered co-ords {coordinates}")
         target_location = clustering(coordinates)
 
         logger.info(f"""
