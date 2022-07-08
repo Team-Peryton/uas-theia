@@ -36,10 +36,10 @@ class ImageRecognition:
         
         logger.warn("Configuring the camera")
         self.picam = Picamera2(verbose_console=0)
-        config = picam.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
-        picam.configure(config)
-        picam.start_preview(Preview.NULL)
-        picam2.start()
+        config = self.picam.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
+        self.picam.configure(config)
+        self.picam.start_preview(Preview.NULL)
+        self.picam.start()
 
         logger.warn("Connecting to Ardupilot")
         self.vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True)
@@ -48,7 +48,7 @@ class ImageRecognition:
         logger.info(self.vehicle)
 
 
-    def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> None:
+    def image_recognition(self, image: np.ndarray, location_info: LocationInfo, name:str) -> None:
         """
         The resulting function of all this mess
         """
@@ -56,11 +56,20 @@ class ImageRecognition:
         target_pixel_locations = find_targets(image, self.options)
         for target in target_pixel_locations:
             location = triangulate(target, location_info)
-            image_name = f"{self.file_base_directory} \\runtime\\ {datetime.now().strftime('%d%m%Y_%H-%M-%S.%f')}.jpg"
-            cv2.imwrite(image_name, image)
-            result = ImageRecognitionResult(image_name=image_name, centre=target, position=location)
+            result = ImageRecognitionResult(image_name=name, centre=target, position=location)
             logger.info(result)
             self.found_targets.append(result)
+    
+
+    def image_recognition_from_files(self):
+        start_height = 142
+        files = [f for f in os.listdir(f"/media/pi/USB DISK/)"]
+
+        for image_number in range(0,len(files)):
+            image = cv.imread(directory + "/" + files[image_number])
+            name = files[image_number].split(",")
+            l = LocationInfo(alt=name[1], lon=name[2], lat=name[3], heading=name[4], roll=name[5], rollspeed=name[6], pitch=name[7], pitchspeed=name[8], yaw=name[9], yawspeed=name[10])
+            self.image_recognition(image,l, name)
 
 
     def calaculate_target_position(self):

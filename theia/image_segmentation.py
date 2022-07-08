@@ -97,7 +97,7 @@ def find_targets(image: np.ndarray, options) -> List[Tuple[int,int]]:
     
     if options["debug"]:
         for index in squareIndexes:
-            cv2.drawContours(image, contours[index], -1, (0, 255, 0), 3)
+            cv2.drawContours(image, contours[index], -1, (0, 255, 0), 5)
         display(image)
 
     # this for loop is mainly to check if there are multiple squares in the same image

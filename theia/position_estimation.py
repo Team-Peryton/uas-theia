@@ -1,5 +1,6 @@
 import math
 from typing import Dict, List, Tuple
+from xmlrpc.client import Boolean
 
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -106,6 +107,22 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
             target_centres.append(point)
 
     return(target_centres)
+
+def search_perimeter(location:LocationInfo) -> bool:
+    perimeter = [(52.780911,-0.705367),(52.780488,-0.707126),(52,781402,-0.707740),(52.781806,-0.705770)]
+
+    line = geometry.LineString(perimeter)
+    perimeter_poly = geometry.Polygon(line)
+    target_centres = []
+    
+    # probably a better way to do it than the loop
+    point_X = LocationInfo.lat
+    point_Y = LocationInfo.lon
+    point = geometry.Point(point_X, point_Y)
+    if perimeter_poly.contains(point):
+        return True
+    else: 
+        return False
 
 
 def clustering(coordinates: List[Tuple[float, float]], epsilon=0.0006, min_samples=5):
