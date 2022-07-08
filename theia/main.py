@@ -1,16 +1,18 @@
 
+import os
 from datetime import datetime
 from distutils.log import debug
 from typing import List
-from picamera2.picamera2 import Picamera2, Preview
-from dronekit import connect
 
 import cv2
 import numpy as np
+from dronekit import connect
 from legacy.clustering import cluster
+from picamera2.picamera2 import Picamera2, Preview
 
 from theia.image_segmentation import find_targets
-from theia.position_estimation import triangulate, clustering, exclude_outside_perimeter
+from theia.position_estimation import (clustering, exclude_outside_perimeter,
+                                       triangulate)
 from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
 
@@ -64,10 +66,10 @@ class ImageRecognition:
 
     def image_recognition_from_files(self):
         start_height = 142
-        files = [f for f in os.listdir(f"/media/pi/USB DISK/)"]
+        files = [f for f in os.listdir(f"/media/pi/USB DISK/")]
 
         for image_number in range(0,len(files)):
-            image = cv.imread(directory + "/" + files[image_number])
+            image = cv2.imread(self.file_base_directory + "/" + files[image_number])
             name = files[image_number].split(",")
             l = LocationInfo(alt=name[1], lon=name[2], lat=name[3], heading=name[4], roll=name[5], rollspeed=name[6], pitch=name[7], pitchspeed=name[8], yaw=name[9], yawspeed=name[10])
             self.image_recognition(image,l, name)
