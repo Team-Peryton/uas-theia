@@ -1,5 +1,6 @@
 import math
 from typing import Dict, List, Tuple
+from xmlrpc.client import Boolean
 
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -59,7 +60,7 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
         (
             location_info.alt * math.tan(location_info.pitch)
         ) + (
-            2 * ((uv[1]/RESOLUTION[1]) - 0.5)
+            2 * ((1-(uv[1]/RESOLUTION[1])) - 0.5)
         ) * (
             location_info.alt * math.tan((RESOLUTION[1]/RESOLUTION[0]) * (FOV_Y/2) + abs(location_info.pitch))
         )
@@ -80,18 +81,21 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
 
 
 def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tuple[float,float]]:
-    # takes all cluster centres as inputs and excludes anything outside the competition perimeter
-    # input competition perimeter GPS coordinates prior to competition. 
+    """ 
+    takes all cluster centres as inputs and excludes anything outside the competition perimeter
+    input competition perimeter GPS coordinates prior to competition. 
+    """
     
     # GPS coords of airfield
     perimeter = [(52.779413, -0.704785),
-(52.781214, -0.702219),
-(52.783095, -0.706073),
-(52.784349, -0.707847),
-(52.785987, -0.711378),
-(52.785614, -0.713564),
-(52.782835, -0.715637),
-(52.778343, -0.712970)]
+        (52.781214, -0.702219),
+        (52.783095, -0.706073),
+        (52.784349, -0.707847),
+        (52.785987, -0.711378),
+        (52.785614, -0.713564),
+        (52.782835, -0.715637),
+        (52.778343, -0.712970)
+    ]
 
     line = geometry.LineString(perimeter)
     perimeter_poly = geometry.Polygon(line)
@@ -106,6 +110,21 @@ def exclude_outside_perimeter(coordinates: List[Tuple[float,float]]) -> List[Tup
             target_centres.append(point)
 
     return(target_centres)
+
+def search_perimeter(location:LocationInfo) -> bool:
+    perimeter = [(52.780911,-0.705367),(52.780488,-0.707126),(52,781402,-0.707740),(52.781806,-0.705770)] #search box
+
+    line = geometry.LineString(perimeter)
+    perimeter_poly = geometry.Polygon(line)
+    
+    # probably a better way to do it than the loop
+    point_X = LocationInfo.lat
+    point_Y = LocationInfo.lon
+    point = geometry.Point(point_X, point_Y)
+    if perimeter_poly.contains(point):
+        return True
+    else: 
+        return False
 
 
 def clustering(coordinates: List[Tuple[float, float]], epsilon=0.0006, min_samples=5):

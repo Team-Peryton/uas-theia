@@ -25,7 +25,7 @@ picam2.start()
 time.sleep(2)
 
 try:
-    while(vehicle.armed):
+    while(True):
         location = vehicle.location.global_frame
         location = f"{location.alt},{location.lon},{location.lat}"
         

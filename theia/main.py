@@ -1,25 +1,29 @@
+
+import os
 from datetime import datetime
 from distutils.log import debug
-from typing import List
-from picamera2.picamera2 import Picamera2, Preview
-from dronekit import connect
+from typing import List, Tuple
 
 import cv2
 import numpy as np
+from dronekit import connect
 from legacy.clustering import cluster
+from picamera2.picamera2 import Picamera2, Preview
 
 from theia.image_segmentation import find_targets
-from theia.position_estimation import triangulate, clustering, exclude_outside_perimeter
+from theia.position_estimation import (clustering, exclude_outside_perimeter,
+                                       triangulate)
 from theia.spec import ImageRecognitionResult, LocationInfo
 from theia.utils import logger
 
 
 class ImageRecognition:
     """
-    all image rec functionality is here
+    all image rec functionality is summed up here.
+    Note return types and class variables
     """
 
-    def __init__(self, file_base_directory):
+    def __init__(self, file_base_directory:str):
         self.options = {
             "block_size": 399,
             "c": -39,
@@ -30,16 +34,18 @@ class ImageRecognition:
             "sides":[4],
             "min_solidity": 0.6,
             "debug": False
-        }
-        self.file_base_directory = file_base_directory
-        self.found_targets: List[ImageRecognitionResult] = []
+        } # options used for square recognition
+
+        self.file_base_directory = file_base_directory # used for image storage location
+        self.found_targets: List[ImageRecognitionResult] = [] # any image rec result is stored here for later reference
         
         logger.warn("Configuring the camera")
         self.picam = Picamera2(verbose_console=0)
-        config = picam.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
-        picam.configure(config)
-        picam.start_preview(Preview.NULL)
-        picam2.start()
+
+        config = self.picam.still_configuration(main={"size": (1920,1080)}) #these 3 lines should turn off preview
+        self.picam.configure(config)
+        self.picam.start_preview(Preview.NULL)
+        self.picam.start()
 
         logger.warn("Connecting to Ardupilot")
         self.vehicle = connect('/dev/ttyACM0', baud=56700, wait_ready=True)
@@ -48,29 +54,54 @@ class ImageRecognition:
         logger.info(self.vehicle)
 
 
-    def image_recognition(self, image: np.ndarray, location_info: LocationInfo) -> None:
+    def image_recognition(self, image: np.ndarray, location_info: LocationInfo, name:str) -> None:
         """
         The resulting function of all this mess
+        Live processes an image and location to predict target location
         """
         logger.info("processing image")
         target_pixel_locations = find_targets(image, self.options)
         for target in target_pixel_locations:
             location = triangulate(target, location_info)
-            image_name = f"{self.file_base_directory} \\runtime\\ {datetime.now().strftime('%d%m%Y_%H-%M-%S.%f')}.jpg"
-            cv2.imwrite(image_name, image)
-            result = ImageRecognitionResult(image_name=image_name, centre=target, position=location)
+            result = ImageRecognitionResult(image_name=name, centre=target, position=location)
             logger.info(result)
             self.found_targets.append(result)
+    
+
+    def image_recognition_from_files(self, start_height:float) -> None:
+        """ 
+        Post processess images written to disk
+        UNTESTED
+        """
+        files:List[str] = [f for f in os.listdir(f"/media/pi/USB DISK/")]
+
+        for image_number in range(0,len(files)):
+            image:np.ndarray = cv2.imread(self.file_base_directory + "/" + files[image_number])
+            name:List[str] = files[image_number].split(",")
+            location = LocationInfo(alt=float(name[1]) - start_height, 
+                lon=float(name[2]), 
+                lat=float(name[3]), 
+                heading=float(name[4]), 
+                roll=float(name[5]), 
+                rollspeed=float(name[6]), 
+                pitch=float(name[7]), 
+                pitchspeed=float(name[8]), 
+                yaw=float(name[9]), 
+                yawspeed=float(name[10])
+            )
+            self.image_recognition(image, location, files[image_number])
 
 
-    def calaculate_target_position(self):
+    def calaculate_target_position(self) -> Tuple[float, float]:
         """
         from the targets found, estimate the actual centre of the target
         done just before landing
         """
         logger.info("Starting clustering")
         coordinates = [result.position for result in self.found_targets]
+        logger.info(f"got raw co-ords{coordinates}")
         coordinates = exclude_outside_perimeter(coordinates)
+        logger.info(f"got filtered co-ords {coordinates}")
         target_location = clustering(coordinates)
 
         logger.info(f"""
@@ -79,11 +110,13 @@ class ImageRecognition:
         {target_location[0]} with {target_location[1]} clusters found and {target_location[2]} outliers
         ------------------------------
         """)
-        return target_location
+        return target_location[0]
     
     
-    def get_found_targets(self):
-        """ debug tool """
+    def get_found_targets(self) -> List[ImageRecognitionResult]:
+        """ 
+        debug tool 
+        """
         logger.info("--- Target Position Information: ---")
         logger.info(f"{len(self.found_targets)} images with targets")
         for i, row in enumerate(self.found_targets):
@@ -92,6 +125,9 @@ class ImageRecognition:
     
 
     def get_location_info(self) -> LocationInfo:
+        """ 
+        package up Ardupilot position stuff 
+        """
         location = self.vehicle.location.global_relative_frame
         heading = self.vehicle.heading
         
@@ -112,4 +148,7 @@ class ImageRecognition:
         )
     
     def get_image(self) -> np.ndarray:
+        """ 
+        get an image from the camera as an array 
+        """
         return self.picam.capture_array()
