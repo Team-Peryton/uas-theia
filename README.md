@@ -2,6 +2,8 @@
 
 Surrey Team Peryton Heron IMechE UAS 2022 Image Recognition program. Enabled successful target recognition at competition!
 
+The program aims to identify a 2x2m white square marker within a search area at the competition. The program then needs to report the GPS location of the marker to the ground station. 
+
 Unfortunatly some of the code is a mess and it's meaning will be lost to time. However, theia/main.py, theia/image_segmentation.py, theia/position_estimation.py should be understandable to a wider audience and may provide assistance to the 2023 competition provided the task does not significantly change.
 
 We ran the code on a raspberry pi 4 using the HQ camera. This can only run the code at around 1/2 a frame per second live, so other tactics may need to be employed for successful recognition.
