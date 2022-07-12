@@ -10,7 +10,7 @@ Target recognition from an image has been demonstrated to be very successful. Ho
 
 - We have provided some of the images from competition without location data : - )
 - There are a bunch of problems with the code and numerous ways to improve it, however this will have to be an adventure for you!
-- We modified some of the code live at comp so there's no garantee any code will run as is.
+- We modified some of the code live at comp so there's no guarantee any code will run as is.
 
 ## Sim Dataset setup
 
