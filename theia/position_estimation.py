@@ -11,7 +11,7 @@ from shapely import geometry
 RESOLUTION = np.array([1080, 1920]) # px
 ASPECT_RATIO = RESOLUTION[1]/RESOLUTION[0]
 FOV = math.radians(63)
-EARTH_RADIUS = 6364.6182202882255            # Radius of "spherical" earth
+EARTH_RADIUS =  6364.6182202882255 *1000         # Radius of "spherical" earth
 
 # from https://stackoverflow.com/questions/31257664/relation-between-horizontal-vertical-and-diagonal-field-of-view
 SENSOR_W = 6.4 #mm
@@ -59,7 +59,7 @@ def triangulate(target_centre: Tuple[float, float], location_info: LocationInfo)
         (
             location_info.alt * math.tan(location_info.pitch)
         ) + (
-            2 * (((uv[1]/RESOLUTION[1])) - 0.5)
+            2 * ((uv[1]/RESOLUTION[1]) - 0.5)
         ) * (
             location_info.alt * math.tan((RESOLUTION[1]/RESOLUTION[0]) * (FOV_Y/2) + abs(location_info.pitch))
         )
