@@ -12,6 +12,9 @@ Target recognition from an image has been demonstrated to be very successful. Ho
 - There are a bunch of problems with the code and numerous ways to improve it, however this will have to be an adventure for you!
 - We modified some of the code live at comp so there's no guarantee any code will run as is.
 
+![](/target1.JPG)
+![](/target2.JPG)
+
 ## Sim Dataset setup
 
 dataset download: https://www.sensefly.com/education/datasets/?dataset=1502
