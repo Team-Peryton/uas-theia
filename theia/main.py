@@ -1,13 +1,10 @@
 
 import os
-from datetime import datetime
-from distutils.log import debug
 from typing import List, Tuple
 
 import cv2
 import numpy as np
 from dronekit import connect
-from legacy.clustering import cluster
 from picamera2.picamera2 import Picamera2, Preview
 
 from theia.image_segmentation import find_targets

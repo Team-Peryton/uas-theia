@@ -1,13 +1,11 @@
 import math
 from typing import Dict, List, Tuple
-from xmlrpc.client import Boolean
 
 import numpy as np
+from shapely import geometry
 from sklearn.cluster import DBSCAN
 
 from theia.spec import LocationInfo
-
-from shapely import geometry
 
 RESOLUTION = np.array([1080, 1920]) # px
 ASPECT_RATIO = RESOLUTION[1]/RESOLUTION[0]
