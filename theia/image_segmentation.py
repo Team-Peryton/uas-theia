@@ -1,36 +1,9 @@
-import math
 from typing import List, Tuple
 
 import cv2
 import numpy as np
 
 from theia.utils import display, logger
-
-
-def calc_distance(p1, p2):
-    """ return the distance between two points """
-    return math.sqrt(((p2[0] - p1[0])**2) + ((p2[1] - p1[0])**2))
-
-
-def get_contour_lengths(approx: List[List[List[int]]]) -> List[int]:
-    """ 
-    extract lengths from the co-ordinates 
-    """
-    # unnest and arrange into each corner co-ords
-    # this could be done programmatically but not really worth it
-    verticies = [
-            [approx[0][0], approx[1][0]],
-            [approx[1][0], approx[2][0]],
-            [approx[2][0], approx[3][0]],
-            [approx[3][0], approx[0][0]]
-        ]
-    lengths = list(map(lambda x: calc_distance(x[0], x[1]), verticies))
-    return sorted(lengths)
-
-
-def is_square(lengths, options) -> bool:
-    """ check if the longest side is close in length to the shortest side """
-    return ((lengths[3] - lengths[0]) / lengths[3]) < options["square_ar"]
 
 
 def approxContour(contour, options):
@@ -41,6 +14,16 @@ def approxContour(contour, options):
     epsilon = options['epsilon'] * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
     return approx
+
+
+def solidity(approx):
+    """
+    Compares the actual area with the convex hull area
+    """
+    area = cv2.contourArea(approx)
+    hull = cv2.convexHull(approx)
+    hull_area = cv2.contourArea(hull)
+    return float(area)/hull_area
 
 
 def filterContours(contours, options):
@@ -54,17 +37,12 @@ def filterContours(contours, options):
         if cv2.contourArea(contour) > options["min_area"]: # remove any tiny noise bits
             approx = approxContour(contour, options)
             if len(approx) in options["sides"]:
-                area = cv2.contourArea(approx)
-                hull = cv2.convexHull(approx)
-                hull_area = cv2.contourArea(hull)
-                solidity = float(area)/hull_area
-                #if is_square(get_contour_lengths(approx), options):
-                if solidity > options["min_solidity"]:
+                if solidity(approx) > options["min_solidity"]:
                     squareIndexes.append(i)
     return squareIndexes
 
 
-def target_centre(contour: list) -> Tuple[int, int]:
+def square_target_centre(contour: list) -> Tuple[int, int]:
     """ 
     given the square corners, return the centre of the square 
     """
@@ -109,14 +87,10 @@ def find_targets(image: np.ndarray, options) -> List[Tuple[int,int]]:
 
         reshaped = target_contour.reshape(4,2)
 
-        centre = target_centre(reshaped)
+        centre = square_target_centre(reshaped)
 
         results.append(
             centre
         )
-
-
-    if len(results) == 0:
-        pass
 
     return results

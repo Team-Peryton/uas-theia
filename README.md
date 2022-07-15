@@ -2,9 +2,23 @@
 
 Surrey Team Peryton Heron IMechE UAS 2022 Image Recognition program. Enabled successful target recognition at competition!
 
-The program aims to identify a 2x2m white square marker within a search area at the competition. The program then needs to report the GPS location of the marker to the ground station. 
+The program aims to identify a 2x2m white square marker within a search area at the competition. The program then needs to report the GPS location of the marker to the ground station.
 
-Unfortunately some of the code is a mess and it's meaning will be lost to time. However, theia/main.py, theia/image_segmentation.py, theia/position_estimation.py should be understandable to a wider audience and may provide assistance to the 2023 competition provided the task does not significantly change.
+## Example.py
+
+- You will need Python (3.9+) installed
+- You will need to run "pip install opencv-python numpy" in your command line
+
+```
+python example.py
+```
+
+Will show the image centres of the example images as well as the threshold image and target contour.
+
+
+## Other explanation
+
+Unfortunately some of the code is a mess and it's meaning will be lost to time. However, theia/main.py, theia/image_segmentation.py, theia/position_estimation.py should be understandable to a wider audience and may provide assistance to the 2023 competition provided the task does not significantly change. A lot of the code testing and tuning was developed in experiment.ipynb, however all kinds of code atrocities have probably been committed there.
 
 We ran the code on a raspberry pi 4 using the HQ camera. This can only run the code at around 1/2 a frame per second live, so other tactics may need to be employed for successful recognition.
 
@@ -17,11 +31,11 @@ Target recognition from an image has been demonstrated to be very successful. Ho
 ![](/target1.JPG)
 ![](/target2.JPG)
 
-## Setup
+## Full Setup
 
 The relevant packages can be installed using pipenv, https://pipenv.pypa.io/en/latest/.
 
-Some of the code depends on picamera2, which will only work on the raspberrypi with the HQ camera.
+Some of the code depends on picamera2, which will only work on the raspberry pi with the HQ camera.
 
 Some of the code depends on dronekit, which cannot be installed using pip and must be installed from their repository, or mine : ) https://github.com/o-gent/dronekit2. This can be done using "pip install ." in the library directory.
 
