@@ -6,7 +6,7 @@ import numpy as np
 from theia.utils import display, logger
 
 
-def approxContour(contour, options):
+def approxContour(contour: list, options: dict):
     """
     fit contour to a simpler shape
     accuracy is based on EPSILON_MULTIPLY
@@ -16,7 +16,7 @@ def approxContour(contour, options):
     return approx
 
 
-def solidity(approx):
+def solidity(approx: list) -> float:
     """
     Compares the actual area with the convex hull area
     """
@@ -26,19 +26,18 @@ def solidity(approx):
     return float(area)/hull_area
 
 
-def filterContours(contours, options):
+def filterContours(contours: list, options: dict):
     """ 
     return only the contours that are squares
     """
     squareIndexes = []
-
-    # filter contours
     for i, contour in enumerate(contours):  # for each of the found contours
         if cv2.contourArea(contour) > options["min_area"]: # remove any tiny noise bits
             approx = approxContour(contour, options)
             if len(approx) in options["sides"]:
                 if solidity(approx) > options["min_solidity"]:
                     squareIndexes.append(i)
+
     return squareIndexes
 
 
@@ -51,10 +50,9 @@ def square_target_centre(contour: list) -> Tuple[int, int]:
     return int(x), int(y)
 
 
-
 def find_targets(image: np.ndarray, options) -> List[Tuple[int,int]]:
     """ 
-    return the centre position within the image
+    return the squaree centre position within the image, in pixels
     """
     imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     imgBlurred = cv2.GaussianBlur(imgGray, (options["ksize"], options["ksize"]), options["sigma"])
@@ -80,17 +78,12 @@ def find_targets(image: np.ndarray, options) -> List[Tuple[int,int]]:
 
     # this for loop is mainly to check if there are multiple squares in the same image
     # otherwise there would not be a loop
-
     results = []
     for index in squareIndexes:
+        # this step has already been done, so potentially filterContours should return the target_contour instead
         target_contour = approxContour(contours[index], options)
-
         reshaped = target_contour.reshape(4,2)
-
         centre = square_target_centre(reshaped)
-
-        results.append(
-            centre
-        )
+        results.append(centre)
 
     return results
