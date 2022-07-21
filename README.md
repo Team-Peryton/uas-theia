@@ -6,7 +6,7 @@ The program aims to identify a 2x2m white square marker within a search area at 
 
 ## How it works
 
-The main image segmentation heavily utilises OpenCV. Each stage has been carefully chosen and tuned based on performance on our datasets. In the target localisation step uses DBSCAN clustering to filter out any potentially unwanted objects/artifacts, since we know there is only one target.
+The main image segmentation heavily utilises OpenCV. Each stage has been carefully chosen and tuned based on performance on our datasets. The target localisation step uses DBSCAN clustering to filter out any potentially unwanted objects/artifacts, since we know there is only one target.
 
 ![](/theia_flowchart.jpg)
 
